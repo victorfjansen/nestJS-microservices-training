@@ -1,8 +1,18 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { Transport } from '@nestjs/microservices';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const logger = new Logger('Microservice');
+  const app = await NestFactory.createMicroservice(AppModule, {
+    transport: Transport.RMQ,
+    options: {
+      urls: ['amqp://user:VgO5mVJaHNEb@44.203.95.171:5672/smartranking'],
+      queue: 'pokemon',
+    },
+  });
+  await app.listen().then(() => logger.log('microservice is listening'));
 }
 bootstrap();
